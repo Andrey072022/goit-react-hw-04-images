@@ -1,18 +1,16 @@
-import { Blocks } from 'react-loader-spinner';
-import css from './Loader.module.css';
+import React from 'react';
+import { Watch } from 'react-loader-spinner';
 
-
-const Loader = ({visible}) => {
-    return <div className={css.Loader} >
-        <Blocks
-            visible={visible}
-            height="80"
-            width="80"
-            ariaLabel="blocks-loading"
-            wrapperStyle={{}}
-            wrapperClass="blocks-wrapper"
-        />
-    </div>;
-};
-
-export default Loader;
+const Loader = () => {
+return <Watch
+  height="80"
+  width="80"
+  radius="48"
+  color="#0d2de4"
+  ariaLabel="watch-loading"
+  wrapperStyle={{}}
+  wrapperClassName=""
+  visible={true}
+/>
+}
+export default Loader; 

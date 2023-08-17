@@ -1,47 +1,39 @@
-import { Component } from 'react';
-import PropTypes from "prop-types";
-import Modal from 'components/Modal/Modal';
-import css from './ImageGalleryItem.module.css';
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import Modal from 'components/Modal';
+import { GalleryItem, GalleryItemImg } from './ImageGalleryItem.styled';
 
+export default function ImageGalleryItem({ el: {webformatURL, tags, largeImageURL} }) {
+  const [showModal, setShowModal] = useState(false);
 
-class ImageGalleryItem extends Component {
-
-    state ={ 
-        isOpen: false,
-    };
-    
-    toggleModal = () => {
-    this.setState(prevState => ({
-      isOpen: !prevState.isOpen
-    }));
+  const toggleModal = () => {
+    setShowModal(!showModal);
   };
 
-    handleOnClick = () => {
-        this.toggleModal();  
-    };
+  const handleImgClick = e => {
+    toggleModal();
+  };
 
-    render() {
-        return (
-            <>
-                <li onClick={this.handleOnClick}
-                    className={css.ImageGalleryItem}>
-                    <img className={css.ImageGalleryItemImg} src={this.props.littleImg} alt={this.props.name} />
-                </li>
-
-                {this.state.isOpen && <Modal
-                    largeImg={this.props.largeImg}
-                    name={this.props.name}
-                    onChangeStatusModal={this.toggleModal}
-                />}
-            </>
-        );
-    }
-};
-
-export default ImageGalleryItem;
+  return (
+    <>
+      <GalleryItem>
+        <GalleryItemImg
+          src={webformatURL}
+          alt={tags}
+          onClick={handleImgClick}
+        />
+      </GalleryItem>
+      {showModal && (
+        <Modal onClose={toggleModal} src={largeImageURL} alt={tags}></Modal>
+      )}
+    </>
+  );
+}
 
 ImageGalleryItem.propTypes = {
-  littleImg: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    largeImg: PropTypes.string.isRequired,
+  el: PropTypes.shape({
+    webformatURL: PropTypes.string.isRequired,
+    tags: PropTypes.string.isRequired,
+    largeImageURL: PropTypes.string.isRequired,
+  }).isRequired,
 };

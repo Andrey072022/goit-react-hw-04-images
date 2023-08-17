@@ -1,52 +1,58 @@
-import { useState } from "react";
-import css from './Searchbar.module.css';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { GoSearch } from 'react-icons/go';
+import {
+  Header,
+  SearchForm,
+  SearchBtn,
+  SearchBtnLabel,
+  SearchFormInput,
+} from './Searchbar.styled';
 
-const Searchbar = ({onSubmit})=> {
+const Searchbar = ({ onSubmit }) => {
+  const [search, setSearch] = useState('');
 
-    const [name, setName] = useState('');
-    const [disabled, setDisable] = useState(true);
+  const handleInputChange = ({ target: { value } }) => {
+    setSearch(value);
+  };
 
-    const handleOnChange = (e) => {
-        setName(e.currentTarget.value);
-        setDisable(false);
-    };
+  const handleSubmit = e => {
+    e.preventDefault();
 
-    const handleOnSubmit = (e) => {
-        e.preventDefault()
+    if (search.trim() === '') {
+      toast.error('Fill the search form!');
+      return;
+    }
 
-        if (name.trim() === "") {
-            return alert("Please, enter a name for the image :)")
-        }
+    onSubmit(search);
+    setSearch('');
+  };
 
-        onSubmit(name);
-        setName('');
-        setDisable(true);
-    };
+  return (
+    <Header>
+      <SearchForm onSubmit={handleSubmit}>
+        <SearchBtn type="submit">
+          <GoSearch />
+          <SearchBtnLabel />
+        </SearchBtn>
 
-    return (
-            <header className={css.Searchbar}>
-                <form
-                    className={css.SearchForm}
-                    onSubmit={handleOnSubmit}>
-                    <button type="submit"
-                        className={css.SearchFormButton}
-                        disabled={disabled}>
-                        <span className={css.SearchFormButtonLabel}>Search</span>
-                    </button>
-
-                    <input
-                        onChange={handleOnChange}
-                        className={css.SearchFormInput}
-                        value={name}
-                        type="text"
-                        autoComplete="off"
-                        autoFocus
-                        placeholder="Search images and photos"
-                    />
-                </form>
-            </header>
-    );
-}; 
+        <SearchFormInput
+          type="text"
+          autoComplete="off"
+          autoFocus
+          placeholder="Search images and photos"
+          onChange={handleInputChange}
+          value={search}
+        />
+      </SearchForm>
+    </Header>
+  );
+};
 
 export default Searchbar;
 
+Searchbar.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+};

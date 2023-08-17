@@ -1,12 +1,13 @@
-.Button {
+import styled from '@emotion/styled';
+
+export const ButtonLM = styled.button`
+  display: block;
   padding: 8px 16px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 35px auto;
   border-radius: 2px;
   background-color: #3f51b5;
   transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
-  display: inline-block;
   color: #fff;
   border: 0;
   text-decoration: none;
@@ -16,12 +17,11 @@
   line-height: 24px;
   font-style: normal;
   font-weight: 500;
-  max-width: 180px;
+  min-width: 180px;
   box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
     0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
-}
-
-.Button:hover,
-.Button:focus {
-  background-color: #303f9f;
-}
+  &:hover,
+  &:focus {
+    background-color: #303f9f;
+  }
+`;

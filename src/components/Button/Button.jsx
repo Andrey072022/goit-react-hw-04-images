@@ -1,23 +1,16 @@
-import css from './Button.module.css';
+import React from 'react';
 import PropTypes from 'prop-types';
+import { ButtonLM } from './Button.styled';
 
-
-const Button = ({onClick}) => {
-    
-    const handleOnClick = () => {
-     onClick()
-    };
-
-        return (
-            <button
-                onClick={handleOnClick}
-                type="button"
-                className={css.Button}>Loade more
-                
-            </button>
-        );
+const Button = ({ onClick }) => {
+  return (
+    <>
+      <ButtonLM type="button" onClick={onClick}>
+        Load more
+      </ButtonLM>
+    </>
+  );
 };
-
 export default Button;
 
 Button.propTypes = {

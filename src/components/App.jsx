@@ -1,94 +1,80 @@
-import { useState, useEffect } from "react";
-import css from './App.module.css';
-import fetchImg from '../helper/Helper';
-import Searchbar from "./Searchbar/Searchbar";
-import ImageGallery from "./ImageGallery/ImageGallery";
-import Button from "./Button/Button";
-import Loader from "./Loader/Loader"; 
+import React, { useState, useEffect } from 'react';
+import { fetchPictures } from '../services/pixabay-api';
+import { ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Searchbar from './Searchbar';
+import ImageGallery from './ImageGallery';
+import Loader from 'components/Loader';
+import Button from 'components/Button';
 
 const App = () => {
-
-  const [name, setName] = useState('');
+  const [searchText, setSearchText] = useState('');
+  const [images, setImages] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [page, setPage] = useState(1);
-  const [totalPage, setTotalPage] = useState(null);
-  const [arrPictures, setArrPictures] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  
-  console.log(error);
-  
+  const [totalPages, setTotalPages] = useState(1);
+
   useEffect(() => {
-    let isMounted = true;
-
-    if (name) {
-        const fetch = async () => {
-        
+    if (searchText === '') {
+      return;
+    }
+    async function fetch() {
       try {
-        setIsLoading(true);
-        const { totalHits, hits, } = await fetchImg(name, page,);
-        const totalP = Math.round(totalHits / 12);
-        const newArr = hits.map(({ id, largeImageURL, webformatURL, }) => {
-          return { id, largeImageURL, webformatURL }
-        });
-
-        if (page === 1) {
-          setArrPictures(newArr)
-          setTotalPage(totalP)
+        setLoading(true);
+        const { hits, totalHits } = await fetchPictures(searchText, page);
+        if (hits.length === 0) {
+          toast.error(
+            'Sorry, there are no images matching your search query. Please try again.'
+          );
         }
-        else {
-          setArrPictures(prevArr => [...prevArr, ...newArr]);
-        };
-
-        if (hits.length === 0) alert('Sorry, there are no images matching your search query. Please try again.');
-      }
-
-      catch (err) {
+        const filtredHits = hits.map(
+          ({ id, largeImageURL, webformatURL, tags }) => {
+            return { id, largeImageURL, webformatURL, tags };
+          }
+        );
+        if (page === 1) {
+          setImages(filtredHits);
+          setTotalPages(Math.ceil(totalHits / 12));
+        }
+        if (page > 1) {
+          setImages(prev => [...prev, ...filtredHits]);
+          setError('');
+        }
+      } catch (err) {
         setError(err.message);
         console.log(err);
+      } finally {
+        setLoading(false);
       }
+    }
 
-      finally {
-        if(isMounted) setIsLoading(false);
-      }
-          
-      }
-      fetch();
-    };
-  }, [name, page,]);
+    fetch();
+  }, [page, searchText]);
 
-
-  const onSubmit = (nameForm) => {
-    setName(nameForm.toLowerCase().trim());
+  const onSubmit = searchText => {
+    setSearchText(searchText);
     setPage(1);
-    setArrPictures([]);
+    setImages(null);
   };
 
-
-  const hadlerOnClick = () => {
-    setPage(prev=> prev+ 1);
+  const handleLoadMoreClick = () => {
+    setPage(prevPage => prevPage + 1);
   };
-
 
   return (
-    <div className={css.App} >
+    <>
       <Searchbar onSubmit={onSubmit} />
-        
-      <ImageGallery
-        arr={arrPictures}
-        name={name}
-      />
-
-      {isLoading &&
-        <Loader />
-      }
-
-      {(arrPictures.length > 0 && page !== totalPage) &&
-        <Button
-          onClick={hadlerOnClick}
-          totalPage={totalPage}
-          page={page}
-        />}
-    </div>);
+      {error && toast.error(error)}
+      {loading && <Loader />}
+      {images?.length > 0 && <ImageGallery images={images} />}
+      {images?.length >= 12 && page !== totalPages && (
+        <Button onClick={handleLoadMoreClick} />
+      )}
+      <ToastContainer autoClose={2000} />
+    </>
+  );
 };
 
 export default App;
